@@ -1,0 +1,54 @@
+<configuration>
+
+    <property name="HOME_LOG" value="logs/app.log"/>
+
+    <!--<appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+        <!--<file>${HOME_LOG}</file>-->
+
+        <!--<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
+            <!--<fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>-->
+            <!--&lt;!&ndash; each archived file, size max 10MB &ndash;&gt;-->
+            <!--<maxFileSize>10MB</maxFileSize>-->
+            <!--&lt;!&ndash; total size of all archive files, if total size > 20GB, it will delete old archived file &ndash;&gt;-->
+            <!--<totalSizeCap>20GB</totalSizeCap>-->
+            <!--&lt;!&ndash; 60 days to keep &ndash;&gt;-->
+            <!--<maxHistory>60</maxHistory>-->
+        <!--</rollingPolicy>-->
+
+        <!--<encoder>-->
+            <!--<pattern>%d %p %c{1.} [%t] %m%n</pattern>-->
+        <!--</encoder>-->
+    <!--</appender>-->
+
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <!-- in the absence of the class attribute, it is assumed that the
+             desired discriminator type is
+             ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+        <discriminator>
+            <key>REQUESTOR</key>
+            <defaultValue>DEFAULT</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-REQUESTOR" class="ch.qos.logback.core.FileAppender">
+                <file>logs/${REQUESTOR}.log</file>
+                <append>false</append>
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <pattern>%d - %msg%n</pattern>
+                </layout>
+            </appender>
+        </sift>
+        <!--<append class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+            <!--<maxFileSize>10MB</maxFileSize>-->
+            <!--<maxBackupIndex>10</maxBackupIndex>-->
+        <!--</append>-->
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="SIFT" />
+    </root>
+
+    <logger name="org.slos" level="debug" additivity="false">
+        <appender-ref ref="SIFT"/>
+    </logger>
+
+</configuration>
